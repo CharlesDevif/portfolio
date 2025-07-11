@@ -1,16 +1,34 @@
-// app/projects/[slug]/page.tsx
 import Image from "next/image"
 import { notFound } from "next/navigation"
+import type { Metadata } from "next"
 import { projects } from "../data"
 
-type Props = { params: { slug: string } }
-
+/* ---------- 1. Routes statiques ---------- */
 export function generateStaticParams() {
   return projects.map((p) => ({ slug: p.slug }))
 }
 
-export default function ProjectPage({ params }: Props) {
-  const project = projects.find((p) => p.slug === params.slug)
+/* ---------- 2. Méta dynamiques ---------- */
+export async function generateMetadata(
+  { params }: { params: Promise<{ slug: string }> }
+): Promise<Metadata> {
+  const { slug } = await params
+  const project = projects.find((p) => p.slug === slug)
+  if (!project) return { title: "Projet introuvable | Charles Devif" }
+
+  return {
+    title: `${project.title} | Projets – Charles Devif`,
+    description: project.summary,
+    openGraph: { images: [project.img] },
+  }
+}
+
+/* ---------- 3. Page détaillée ---------- */
+export default async function ProjectPage(
+  { params }: { params: Promise<{ slug: string }> }
+) {
+  const { slug } = await params
+  const project = projects.find((p) => p.slug === slug)
   if (!project) return notFound()
 
   return (
@@ -24,6 +42,7 @@ export default function ProjectPage({ params }: Props) {
         width={1200}
         height={600}
         className="my-8 rounded-lg border"
+        priority
       />
 
       <p className="mb-6 leading-7">{project.summary}</p>
