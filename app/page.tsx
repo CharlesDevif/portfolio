@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import ProjectCard from "@/components/ProjectCard"
 import { projects } from "./projects/data"
 import { motion } from "framer-motion"
-import { use } from "react"
 
 export default function Home() {
   return (
